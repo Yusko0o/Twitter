@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from backend.getpfp import getpfp
+from backend.GetPfp import getpfp
 
 app = Flask(__name__)
 
