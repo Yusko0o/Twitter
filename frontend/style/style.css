@@ -1,7 +1,20 @@
+body {
+    margin: 0;
+    display: flex;
+}
+
+header {
+    width: 250px;
+}
+
+main {
+    flex: 1;
+}
+
 .sidebar {
     display: flex;
     flex-direction: column;
-    
+    width: 180px;
 }
 
 .nav-bar {
@@ -11,10 +24,13 @@
     align-items: stretch;
 }
 
+.nav-bar, a {
+    padding: 10px;
+}
+
 .posts {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 300px;
 }
 
