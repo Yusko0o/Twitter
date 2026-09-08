@@ -1,56 +1,165 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="stylesheet" href="/frontend/style/style.css" />
+
+    <title>Social</title>
+
+    <link rel="stylesheet" href="/style/style.css" />
   </head>
 
-  <header>
-    <div class="sidebar">
-      <div class="logo">
-          <h1>
-            <a href=""
-              ><img src="/frontend/images/logo.png" alt="" width="40px"
-            /></a>
-          </h1>
-        </div>
-        <nav class="nav-bar">
-          <a href=""
-            ><img src="/frontend/images/navbar/home.png" width="30px" /> Home</a
-          >
-          <a href=""
-            ><img src="/frontend/images/navbar/search.png" width="30px" />
-            Search</a
-          >
-          <a href=""
-            ><img src="/frontend/images/navbar/follow.png" width="30px" />
-            Follow</a
-          >
-          <a href=""
-            ><img src="/frontend/images/navbar/chat.png" width="30px" />
-            Converstation</a
-          >
-          <a href=""
-            ><img src="/frontend/images/navbar/save.png" width="30px" />
-            Bookmarks
+  <body>
+    <header>
+      <div class="sidebar">
+        <div class="logo">
+          <a href="/">
+            <img src="/images/logo.png" alt="Logo" width="40" />
           </a>
-          <a href=""
-            ><img src="/frontend/images/navbar/user.png" width="30px" /> Profile
+        </div>
+
+        <nav class="nav-bar">
+          <a href="#" class="nav-item active">
+            <img src="/images/navbar/home.png" width="30" alt="" />
+            <span>Home</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/search.png" width="30" alt="" />
+            <span>Search</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/follow.png" width="30" alt="" />
+            <span>Follow</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/chat.png" width="30" alt="" />
+            <span>Messages</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/save.png" width="30" alt="" />
+            <span>Bookmarks</span>
+          </a>
+
+          <a href="/profile" class="nav-item">
+            <img src="/images/navbar/user.png" width="30" alt="" />
+            <span>Profile</span>
           </a>
         </nav>
+
+        <button class="create-post">+ Create</button>
+
+        <div class="auth-buttons">
+          <a href="/login" class="login-button"> Log in </a>
+
+          <a href="/register" class="register-button"> Sign up </a>
+        </div>
       </div>
-  </header>
-  <main>
-    <div class="posts">
-      <div class="profil">
-        <img id="profile-picture" src="" alt="Profile picture">
-      </div>
-      <input type="text" name="Post" id="post">
-    </div>
-  </main>
-  <body>
-    <script src="/frontend/script/main.js"></script>
+    </header>
+
+    <main>
+      <section class="feed">
+        <div class="feed-header">
+          <h2>Home</h2>
+        </div>
+
+        <div class="create-post-box">
+          <div class="post-user">
+            <img
+              id="profile-picture"
+              src="/images/default-profile.png"
+              alt="Profile picture"
+            />
+          </div>
+
+          <div class="post-content">
+            <textarea
+              id="post"
+              placeholder="What's happening?"
+              maxlength="500"
+            ></textarea>
+
+            <div class="post-actions">
+              <div class="media-buttons">
+                <button type="button" id="image-button" title="Add image">
+                  📷
+                </button>
+
+                <button type="button" id="video-button" title="Add video">
+                  🎥
+                </button>
+
+                <button
+                  type="button"
+                  id="emoji-button"
+                  title="Add emoji"
+                ></button>
+              </div>
+
+              <button type="button" id="publish-post">Post</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="posts-container">
+          <article class="post">
+            <div class="post-avatar">
+              <img src="/images/default-profile.png" alt="Profile" />
+            </div>
+
+            <div class="post-body">
+              <div class="post-user-info">
+                <strong>Kilian</strong>
+
+                <span>@kilian</span>
+
+                <span>·</span>
+
+                <span>2h</span>
+              </div>
+
+              <p>Welcome to my new social network 👋</p>
+
+              <div class="post-footer">
+                <button>12</button>
+                <button>5</button>
+                <button>28</button>
+                <button>🔖</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <aside class="right-sidebar">
+        <div class="search-box">
+          <input type="text" placeholder="Search" />
+        </div>
+
+        <div class="trends">
+          <h3>What's happening</h3>
+
+          <div class="trend">
+            <span>Trending</span>
+            <strong>#Technology</strong>
+          </div>
+
+          <div class="trend">
+            <span>Trending</span>
+            <strong>#Gaming</strong>
+          </div>
+
+          <div class="trend">
+            <span>Trending</span>
+            <strong>#Music</strong>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <script src="/script/main.js"></script>
   </body>
 </html>

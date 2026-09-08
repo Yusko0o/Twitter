@@ -1,0 +1,193 @@
+<!doctype html>
+
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile</title>
+    <link rel="stylesheet" href="/style/profile.css" />
+  </head>
+
+  <body>
+    <header>
+      <div class="sidebar">
+        <div class="logo">
+          <a href="/">
+            <img src="/images/logo.png" alt="Logo" width="40" />
+          </a>
+        </div>
+
+        <nav class="nav-bar">
+          <a href="/" class="nav-item">
+            <img src="/images/navbar/home.png" width="30" alt="" />
+            <span>Home</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/search.png" width="30" alt="" />
+            <span>Search</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/follow.png" width="30" alt="" />
+            <span>Follow</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/chat.png" width="30" alt="" />
+            <span>Messages</span>
+          </a>
+
+          <a href="#" class="nav-item">
+            <img src="/images/navbar/save.png" width="30" alt="" />
+            <span>Bookmarks</span>
+          </a>
+
+          <a href="/profile" class="nav-item active">
+            <img src="/images/navbar/user.png" width="30" alt="" />
+            <span>Profile</span>
+          </a>
+        </nav>
+
+        <button class="create-post">+ Create</button>
+
+        <div class="auth-buttons">
+          <button id="logout-button" class="logout-button">Log out</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="profile">
+        <div class="profile-header">
+          <div class="profile-banner"></div>
+
+          <div class="profile-info">
+            <div class="profile-picture-container">
+              <img
+                id="profile-picture"
+                src="/images/default-profile.png"
+                alt="Profile picture"
+              />
+            </div>
+
+            <div class="profile-actions">
+              <button id="edit-profile-button">Edit profile</button>
+            </div>
+
+            <div class="profile-details">
+              <h1 id="profile-username">Username</h1>
+
+              <p id="profile-handle">@username</p>
+
+              <p id="profile-bio">No bio yet.</p>
+
+              <p class="profile-joined">
+                📅 Joined
+                <span id="profile-created-at">-</span>
+              </p>
+            </div>
+
+            <div class="profile-stats">
+              <div class="stat">
+                <strong id="following-count">0</strong>
+                <span>Following</span>
+              </div>
+
+              <div class="stat">
+                <strong id="followers-count">0</strong>
+                <span>Followers</span>
+              </div>
+
+              <div class="stat">
+                <strong id="posts-count">0</strong>
+                <span>Posts</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-tabs">
+          <button class="profile-tab active">Posts</button>
+          <button class="profile-tab">Replies</button>
+          <button class="profile-tab">Media</button>
+          <button class="profile-tab">Likes</button>
+        </div>
+
+        <div id="user-posts">
+          <div class="empty-profile">
+            <h2>You haven't posted anything yet</h2>
+            <p>Your posts will appear here.</p>
+          </div>
+        </div>
+      </section>
+
+      <aside class="right-sidebar">
+        <div class="search-box">
+          <input type="text" placeholder="Search" />
+        </div>
+
+        <div class="trends">
+          <h3>What's happening</h3>
+
+          <div class="trend">
+            <span>Trending</span>
+            <strong>#Technology</strong>
+          </div>
+
+          <div class="trend">
+            <span>Trending</span>
+            <strong>#Gaming</strong>
+          </div>
+
+          <div class="trend">
+            <span>Trending</span>
+            <strong>#Music</strong>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <div id="edit-profile-modal" class="modal hidden">
+      <div class="modal-overlay"></div>
+
+      <div class="edit-profile-box">
+        <button id="close-edit-profile" class="close-button" type="button">
+          ×
+        </button>
+
+        <h2>Edit profile</h2>
+
+        <form id="edit-profile-form">
+          <div class="input-group">
+            <label for="edit-username">Username</label>
+
+            <input
+              type="text"
+              id="edit-username"
+              maxlength="50"
+              autocomplete="username"
+              required
+            />
+          </div>
+
+          <div class="input-group">
+            <label for="edit-bio">Bio</label>
+
+            <textarea
+              id="edit-bio"
+              maxlength="160"
+              placeholder="Tell people about yourself..."
+            ></textarea>
+          </div>
+
+          <p id="edit-profile-error"></p>
+
+          <button type="submit" id="save-profile-button">Save changes</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="/script/profile.js"></script>
+  </body>
+</html>
