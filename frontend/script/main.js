@@ -1,5 +1,7 @@
 const API_URL = "";
 
+const DEFAULT_PROFILE_PICTURE = "/images/default-profile.png";
+
 document.addEventListener("DOMContentLoaded", async () => {
   await loadUser();
   await loadPosts();
@@ -11,14 +13,22 @@ async function loadUser() {
     const response = await fetch(`${API_URL}/api/auth/me`, {
       credentials: "include",
     });
+
     if (!response.ok) {
       return;
     }
+
     const data = await response.json();
     const user = data.user || data;
     const profilePicture = document.querySelector("#profile-picture");
-    if (profilePicture && user.avatar) {
-      profilePicture.src = user.avatar;
+    const authButtons = document.querySelector(".auth-buttons");
+
+    if (authButtons) {
+      authButtons.style.display = "none";
+    }
+
+    if (profilePicture) {
+      profilePicture.src = user.avatar || DEFAULT_PROFILE_PICTURE;
     }
   } catch (error) {
     console.error("Erreur lors du chargement de l'utilisateur :", error);
@@ -30,9 +40,11 @@ async function loadPosts() {
     const response = await fetch(`${API_URL}/api/posts`, {
       credentials: "include",
     });
+
     if (!response.ok) {
       throw new Error("Impossible de récupérer les posts");
     }
+
     const posts = await response.json();
     displayPosts(posts);
   } catch (error) {
@@ -43,16 +55,20 @@ async function loadPosts() {
 function setupPost() {
   const input = document.querySelector("#post");
   const publishButton = document.querySelector("#publish-post");
+
   if (!input) {
     return;
   }
+
   if (publishButton) {
     publishButton.addEventListener("click", createPost);
   }
+
   input.addEventListener("keydown", async (event) => {
     if (event.key !== "Enter" || event.shiftKey) {
       return;
     }
+
     event.preventDefault();
     await createPost();
   });
@@ -109,44 +125,49 @@ function displayPosts(posts) {
   }
 
   container.innerHTML = "";
+
   posts.forEach((post) => {
     const article = document.createElement("article");
-
     article.classList.add("post");
 
     const avatarContainer = document.createElement("div");
-
     avatarContainer.classList.add("post-avatar");
 
     const avatar = document.createElement("img");
-
-    avatar.src =
-      post.avatar || post.profile_picture || "/images/default-profile.png";
+    avatar.src = post.avatar || DEFAULT_PROFILE_PICTURE;
     avatar.alt = "Profile";
-
     avatarContainer.appendChild(avatar);
+
     const body = document.createElement("div");
     body.classList.add("post-body");
+
     const userInfo = document.createElement("div");
     userInfo.classList.add("post-user-info");
+
     const username = document.createElement("strong");
     username.textContent = post.username || "User";
+
     const handle = document.createElement("span");
-    handle.textContent = post.handle ? `@${post.handle}` : "";
+    handle.textContent = `@${post.handle || post.username || "user"}`;
+
     const separator = document.createElement("span");
     separator.textContent = " · ";
+
     const date = document.createElement("span");
     date.textContent = formatDate(post.created_at);
+
     userInfo.appendChild(username);
     userInfo.appendChild(handle);
     userInfo.appendChild(separator);
     userInfo.appendChild(date);
     body.appendChild(userInfo);
+
     if (post.content) {
       const content = document.createElement("p");
       content.textContent = post.content;
       body.appendChild(content);
     }
+
     if (post.image_url) {
       const image = document.createElement("img");
       image.classList.add("post-media");
@@ -162,16 +183,22 @@ function displayPosts(posts) {
       video.controls = true;
       body.appendChild(video);
     }
+
     const footer = document.createElement("div");
     footer.classList.add("post-footer");
+
     const likes = document.createElement("button");
     likes.textContent = `❤️ ${post.likes_count || 0}`;
+
     const comments = document.createElement("button");
     comments.textContent = `💬 ${post.comments_count || 0}`;
+
     const share = document.createElement("button");
     share.textContent = "↗️";
+
     const save = document.createElement("button");
     save.textContent = "🔖";
+
     footer.appendChild(likes);
     footer.appendChild(comments);
     footer.appendChild(share);
@@ -182,24 +209,32 @@ function displayPosts(posts) {
     container.appendChild(article);
   });
 }
+
 function formatDate(date) {
   if (!date) {
     return "";
   }
+
   const createdAt = new Date(date);
   const now = new Date();
-  const difference = Math.floor((now - createdAt) / 1000);
+  const difference = Math.max(0, Math.floor((now - createdAt) / 1000));
+
   if (difference < 60) {
     return `${difference}s`;
   }
+
   const minutes = Math.floor(difference / 60);
+
   if (minutes < 60) {
     return `${minutes}m`;
   }
+
   const hours = Math.floor(minutes / 60);
+
   if (hours < 24) {
     return `${hours}h`;
   }
+
   const days = Math.floor(hours / 24);
   return `${days}d`;
 }

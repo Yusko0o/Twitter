@@ -1,5 +1,4 @@
 const bcrypt = require("bcrypt");
-
 const userModel = require("../models/userModel");
 
 async function register(req, res) {
@@ -44,18 +43,11 @@ async function register(req, res) {
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-
     const user = await userModel.createUser(
       cleanUsername,
       cleanEmail,
       passwordHash,
     );
-
-    req.session.user = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-    };
 
     return res.status(201).json({
       message: "Account created successfully",
@@ -81,7 +73,6 @@ async function login(req, res) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
-
     const user = await userModel.findUserByEmail(cleanEmail);
 
     if (!user) {
@@ -177,7 +168,7 @@ async function updateProfile(req, res) {
       });
     }
 
-    const { username, bio } = req.body;
+    const { username, bio, avatar } = req.body;
 
     if (!username) {
       return res.status(400).json({
@@ -187,6 +178,7 @@ async function updateProfile(req, res) {
 
     const cleanUsername = username.trim();
     const cleanBio = typeof bio === "string" ? bio.trim() : "";
+    let cleanAvatar = null;
 
     if (cleanUsername.length < 3 || cleanUsername.length > 50) {
       return res.status(400).json({
@@ -198,6 +190,30 @@ async function updateProfile(req, res) {
       return res.status(400).json({
         error: "Bio cannot contain more than 160 characters",
       });
+    }
+
+    if (avatar !== undefined && avatar !== null && avatar !== "") {
+      if (typeof avatar !== "string") {
+        return res.status(400).json({
+          error: "Invalid profile picture",
+        });
+      }
+
+      const avatarPattern = /^data:image\/(png|jpeg|jpg|webp|gif);base64,/i;
+
+      if (!avatarPattern.test(avatar)) {
+        return res.status(400).json({
+          error: "Profile picture must be a PNG, JPG, WEBP or GIF image",
+        });
+      }
+
+      if (avatar.length > 3000000) {
+        return res.status(400).json({
+          error: "Profile picture is too large",
+        });
+      }
+
+      cleanAvatar = avatar;
     }
 
     const usernameAlreadyExists = await userModel.usernameExistsForOtherUser(
@@ -215,6 +231,7 @@ async function updateProfile(req, res) {
       req.session.user.id,
       cleanUsername,
       cleanBio,
+      cleanAvatar,
     );
 
     if (!user) {

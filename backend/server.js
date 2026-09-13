@@ -10,7 +10,6 @@ const authRoutes = require("./routes/authRoutes");
 dotenv.config();
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 
 if (!process.env.SESSION_SECRET) {
@@ -25,7 +24,7 @@ app.use(
   }),
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "4mb" }));
 
 app.use(
   session({

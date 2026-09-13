@@ -1,8 +1,10 @@
 const API_URL = "";
+const DEFAULT_PROFILE_PICTURE = "/images/default-profile.png";
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
+const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
 document.addEventListener("DOMContentLoaded", async () => {
   await loadProfile();
-
   setupLogout();
   setupEditProfile();
 });
@@ -31,8 +33,7 @@ async function loadProfile() {
     username.textContent = user.username;
     handle.textContent = `@${user.username}`;
     bio.textContent = user.bio || "No bio yet.";
-
-    picture.src = user.avatar || "/images/default-profile.png";
+    picture.src = user.avatar || DEFAULT_PROFILE_PICTURE;
 
     if (user.created_at) {
       const date = new Date(user.created_at);
@@ -69,7 +70,6 @@ async function loadUserPosts(userId) {
     }
 
     const posts = await response.json();
-
     const userPosts = posts.filter(
       (post) => Number(post.user_id) === Number(userId),
     );
@@ -90,9 +90,12 @@ function displayUserPosts(posts) {
   container.innerHTML = "";
 
   if (posts.length === 0) {
-    container.innerHTML = `       <div class="empty-profile">         <h2>You haven't posted anything yet</h2>         <p>Your posts will appear here.</p>       </div>
+    container.innerHTML = `
+      <div class="empty-profile">
+        <h2>You haven't posted anything yet</h2>
+        <p>Your posts will appear here.</p>
+      </div>
     `;
-
     return;
   }
 
@@ -104,11 +107,8 @@ function displayUserPosts(posts) {
     avatar.classList.add("post-avatar");
 
     const avatarImage = document.createElement("img");
-
-    avatarImage.src = post.profile_picture || "/images/default-profile.png";
-
+    avatarImage.src = post.avatar || DEFAULT_PROFILE_PICTURE;
     avatarImage.alt = "Profile picture";
-
     avatar.appendChild(avatarImage);
 
     const body = document.createElement("div");
@@ -130,16 +130,14 @@ function displayUserPosts(posts) {
     date.textContent = formatPostDate(post.created_at);
 
     userInfo.append(username, handle, separator, date);
-
     body.appendChild(userInfo);
 
     if (post.content) {
       const content = document.createElement("p");
-
       content.textContent = post.content;
-
       body.appendChild(content);
     }
+
 
     const footer = document.createElement("div");
     footer.classList.add("post-footer");
@@ -157,11 +155,8 @@ function displayUserPosts(posts) {
     save.textContent = "🔖";
 
     footer.append(likes, comments, share, save);
-
     body.appendChild(footer);
-
     article.append(avatar, body);
-
     container.appendChild(article);
   });
 }
@@ -173,8 +168,7 @@ function formatPostDate(createdAt) {
 
   const date = new Date(createdAt);
   const now = new Date();
-
-  const difference = Math.floor((now - date) / 1000);
+  const difference = Math.max(0, Math.floor((now - date) / 1000));
 
   if (difference < 60) {
     return `${difference}s`;
@@ -246,9 +240,8 @@ function setupEditProfile() {
       const user = data.user || data;
 
       document.querySelector("#edit-username").value = user.username || "";
-
       document.querySelector("#edit-bio").value = user.bio || "";
-
+      document.querySelector("#edit-avatar").value = "";
       document.querySelector("#edit-profile-error").textContent = "";
 
       modal.classList.remove("hidden");
@@ -258,60 +251,92 @@ function setupEditProfile() {
   });
 
   closeButton.addEventListener("click", closeEditModal);
-
   overlay.addEventListener("click", closeEditModal);
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const username = document.querySelector("#edit-username").value.trim();
-
     const bio = document.querySelector("#edit-bio").value.trim();
-
+    const avatarInput = document.querySelector("#edit-avatar");
     const errorElement = document.querySelector("#edit-profile-error");
 
     if (username.length < 3 || username.length > 50) {
       errorElement.textContent =
         "Username must contain between 3 and 50 characters.";
-
       return;
     }
 
     if (bio.length > 160) {
       errorElement.textContent = "Bio cannot contain more than 160 characters.";
-
       return;
     }
 
+    const selectedAvatar = avatarInput?.files?.[0] || null;
+    let avatar;
+
+    if (selectedAvatar) {
+      if (!ALLOWED_AVATAR_TYPES.includes(selectedAvatar.type)) {
+        errorElement.textContent = "Choose a PNG, JPG, WEBP or GIF image.";
+        return;
+      }
+
+      if (selectedAvatar.size > MAX_AVATAR_SIZE) {
+        errorElement.textContent = "Profile picture cannot exceed 2 MB.";
+        return;
+      }
+
+      try {
+        avatar = await readFileAsDataURL(selectedAvatar);
+      } catch (error) {
+        console.error("Avatar read error:", error);
+        errorElement.textContent = "Unable to read the selected image.";
+        return;
+      }
+    }
+
     try {
+      const body = {
+        username,
+        bio,
+      };
+
+      if (avatar) {
+        body.avatar = avatar;
+      }
+
       const response = await fetch(`${API_URL}/api/auth/me`, {
         method: "PUT",
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          username,
-          bio,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
         errorElement.textContent = data.error || "Failed to update profile.";
-
         return;
       }
 
       closeEditModal();
-
       await loadProfile();
     } catch (error) {
       console.error("Update profile error:", error);
-
       errorElement.textContent = "Unable to update your profile.";
     }
+  });
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
   });
 }
 

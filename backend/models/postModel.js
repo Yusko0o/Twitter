@@ -23,7 +23,7 @@ async function getPosts() {
       posts.video_url,
       posts.created_at,
       users.username,
-      users.avatar,
+      COALESCE(users.avatar, users.profile_picture) AS avatar,
       0 AS likes_count,
       0 AS comments_count
     FROM posts
