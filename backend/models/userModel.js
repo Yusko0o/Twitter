@@ -3,14 +3,7 @@ const db = require("../database");
 async function findUserByEmail(email) {
   const result = await db.query(
     `
-      SELECT
-        id,
-        username,
-        email,
-        password_hash,
-        COALESCE(avatar, profile_picture) AS avatar,
-        bio,
-        created_at
+      SELECT id, username, email, password_hash, avatar, bio, created_at
       FROM users
       WHERE email = $1
       LIMIT 1
@@ -28,14 +21,12 @@ async function findUserById(id) {
         u.id,
         u.username,
         u.email,
-        COALESCE(u.avatar, u.profile_picture) AS avatar,
+        u.avatar,
         u.bio,
         u.created_at,
-        (
-          SELECT COUNT(*)
-          FROM posts
-          WHERE user_id = u.id
-        ) AS posts_count
+        (SELECT COUNT(*)::int FROM posts WHERE user_id = u.id) AS posts_count,
+        (SELECT COUNT(*)::int FROM follows WHERE following_id = u.id) AS followers_count,
+        (SELECT COUNT(*)::int FROM follows WHERE follower_id = u.id) AS following_count
       FROM users u
       WHERE u.id = $1
       LIMIT 1
@@ -60,48 +51,33 @@ async function createUser(username, email, passwordHash) {
 }
 
 async function emailExists(email) {
-  const result = await db.query(
-    `SELECT id FROM users WHERE email = $1 LIMIT 1`,
-    [email],
-  );
-
-  return result.rows.length > 0;
+  const result = await db.query(`SELECT 1 FROM users WHERE email = $1 LIMIT 1`, [email]);
+  return result.rowCount > 0;
 }
 
 async function usernameExists(username) {
   const result = await db.query(
-    `SELECT id FROM users WHERE username = $1 LIMIT 1`,
+    `SELECT 1 FROM users WHERE LOWER(username) = LOWER($1) LIMIT 1`,
     [username],
   );
-
-  return result.rows.length > 0;
+  return result.rowCount > 0;
 }
 
 async function usernameExistsForOtherUser(username, userId) {
   const result = await db.query(
-    `SELECT id FROM users WHERE username = $1 AND id != $2 LIMIT 1`,
+    `SELECT 1 FROM users WHERE LOWER(username) = LOWER($1) AND id != $2 LIMIT 1`,
     [username, userId],
   );
-
-  return result.rows.length > 0;
+  return result.rowCount > 0;
 }
 
 async function updateUser(userId, username, bio, avatar) {
   const result = await db.query(
     `
       UPDATE users
-      SET
-        username = $1,
-        bio = $2,
-        avatar = COALESCE($3, avatar, profile_picture)
+      SET username = $1, bio = $2, avatar = COALESCE($3, avatar)
       WHERE id = $4
-      RETURNING
-        id,
-        username,
-        email,
-        COALESCE(avatar, profile_picture) AS avatar,
-        bio,
-        created_at
+      RETURNING id, username, email, avatar, bio, created_at
     `,
     [username, bio, avatar, userId],
   );

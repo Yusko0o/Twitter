@@ -138,21 +138,63 @@ function displayUserPosts(posts) {
       body.appendChild(content);
     }
 
+    if (post.image_url) {
+      const image = document.createElement("img");
+      image.classList.add("post-media");
+      image.src = post.image_url;
+      image.alt = "Post image";
+      body.appendChild(image);
+    }
+
+    if (post.video_url) {
+      const video = document.createElement("video");
+      video.classList.add("post-media");
+      video.src = post.video_url;
+      video.controls = true;
+      body.appendChild(video);
+    }
 
     const footer = document.createElement("div");
     footer.classList.add("post-footer");
 
     const likes = document.createElement("button");
     likes.textContent = `❤️ ${post.likes_count || 0}`;
+    if (post.liked_by_me) likes.classList.add("active");
+    likes.addEventListener("click", async () => {
+      const response = await fetch(`${API_URL}/api/posts/${post.id}/like`, {
+        method: post.liked_by_me ? "DELETE" : "POST",
+        credentials: "include",
+      });
+      if (response.ok) await loadProfile();
+    });
 
     const comments = document.createElement("button");
     comments.textContent = `💬 ${post.comments_count || 0}`;
+    comments.addEventListener("click", () => {
+      window.location.href = `/#post-${post.id}`;
+    });
 
     const share = document.createElement("button");
     share.textContent = "↗️";
+    share.addEventListener("click", async () => {
+      const url = `${window.location.origin}/#post-${post.id}`;
+      if (navigator.share) {
+        await navigator.share({ title: `Post by ${post.username}`, text: post.content || "", url }).catch(() => {});
+      } else {
+        await navigator.clipboard.writeText(url);
+      }
+    });
 
     const save = document.createElement("button");
-    save.textContent = "🔖";
+    save.textContent = post.bookmarked_by_me ? "🔖 Saved" : "🔖";
+    if (post.bookmarked_by_me) save.classList.add("active");
+    save.addEventListener("click", async () => {
+      const response = await fetch(`${API_URL}/api/posts/${post.id}/bookmark`, {
+        method: post.bookmarked_by_me ? "DELETE" : "POST",
+        credentials: "include",
+      });
+      if (response.ok) await loadProfile();
+    });
 
     footer.append(likes, comments, share, save);
     body.appendChild(footer);
