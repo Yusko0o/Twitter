@@ -24,11 +24,9 @@ The application allows users to create an account, authenticate securely, manage
 
 ### Profiles
 
-* User profiles
 * Custom usernames
 * Profile pictures
 * Biography
-* Profile statistics
 * Profile editing
 
 ### Posts
@@ -45,8 +43,6 @@ The application allows users to create an account, authenticate securely, manage
 * Likes
 * Comments
 * Bookmarks
-* Follow relationships
-* Post sharing
 * Feed search
 
 ---
@@ -68,7 +64,7 @@ The application allows users to create an account, authenticate securely, manage
 
 * HTML5
 * CSS3
-* Vanilla JavaScript
+* JavaScript
 * Fetch API
 
 ### Database
@@ -79,8 +75,6 @@ PostgreSQL is used for persistent application data, including:
 * posts
 * likes
 * comments
-* bookmarks
-* follows
 * sessions
 
 ---
